@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐛 昆虫人格测试</title>
+    <style>
+        /* ========== 全局样式重置 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ========== 页面基础样式 - 丛林暗绿色调 ========== */
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(180deg, #0a1f0a 0%, #1a3a1a 50%, #0d2818 100%);
+            min-height: 100vh;
+            color: #e8f5e8;
+            line-height: 1.6;
+        }
+
+        /* 丛林纹理背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(34, 85, 34, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(20, 60, 20, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ========== 标题区域 ========== */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #7cb342;
+            text-shadow: 0 0 20px rgba(124, 179, 66, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a5d6a7;
+            font-size: 14px;
+        }
+
+        /* ========== 欢迎页 ========== */
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-screen .intro {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(124, 179, 66, 0.2);
+        }
+
+        .welcome-screen .intro p {
+            color: #c8e6c9;
+            margin-bottom: 15px;
+        }
+
+        .welcome-screen .bug-icons {
+            font-size: 40px;
+            margin: 30px 0;
+            letter-spacing: 15px;
+        }
+
+        /* 开始按钮 */
+        .btn-start {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #558b2f 0%, #7cb342 100%);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(124, 179, 66, 0.4);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(124, 179, 66, 0.6);
+        }
+
+        /* ========== 题目区域 ========== */
+        .quiz-screen {
+            display: none;
+        }
+
+        .quiz-screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #7cb342, #9ccc65);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #81c784;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(124, 179, 66, 0.2);
+        }
+
+        .question-number {
+            color: #7cb342;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        /* 选项按钮 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(124, 179, 66, 0.3);
+            border-radius: 12px;
+            color: #c8e6c9;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(124, 179, 66, 0.2);
+            border-color: #7cb342;
+            transform: translateX(5px);
+        }
+
+        .option-btn:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        /* ========== 结果页 ========== */
+        .result-screen {
+            display: none;
+        }
+
+        .result-screen.active {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        /* 你的昆虫人格 */
+        .result-main {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(124, 179, 66, 0.3);
+        }
+
+        .result-bug-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .result-title {
+            color: #7cb342;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .result-bug-name {
+            font-size: 48px;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(124, 179, 66, 0.5);
+        }
+
+        .result-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .tag {
+            background: rgba(124, 179, 66, 0.2);
+            border: 1px solid rgba(124, 179, 66, 0.5);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #a5d6a7;
+        }
+
+        .result-description {
+            color: #c8e6c9;
+            font-size: 16px;
+            line-height: 1.8;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        /* 天敌揭示 */
+        .nemesis-section {
+            background: linear-gradient(180deg, rgba(139, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 100%);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            border: 2px solid rgba(139, 69, 69, 0.4);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nemesis-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .nemesis-label {
+            color: #ef5350;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .nemesis-icon {
+            font-size: 80px;
+            margin-bottom: 15px;
+        }
+
+        .nemesis-name {
+            font-size: 36px;
+            color: #ff8a80;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .nemesis-reason {
+            color: #ffab91;
+            font-size: 16px;
+            line-height: 1.7;
+            font-style: italic;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* 其他昆虫得分 */
+        .other-results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .other-results h3 {
+            color: #7cb342;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mini-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mini-result:last-child {
+            margin-bottom: 0;
+        }
+
+        .mini-result .bug-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mini-result .bug-icon {
+            font-size: 24px;
+        }
+
+        .mini-result .bug-name {
+            color: #c8e6c9;
+        }
+
+        .mini-result .score {
+            color: #7cb342;
+            font-weight: bold;
+        }
+
+        /* 重新测试按钮 */
+        .btn-restart {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: 2px solid #7cb342;
+            border-radius: 30px;
+            color: #7cb342;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-restart:hover {
+            background: #7cb342;
+            color: #0a1f0a;
+        }
+
+        /* ========== 响应式适配 ========== */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .question-text {
+                font-size: 18px;
+            }
+
+            .result-bug-name {
+                font-size: 36px;
+            }
+
+            .nemesis-name {
+                font-size: 28px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题 -->
+        <div class="header">
+            <h1>🐛 昆虫人格测试</h1>
+            <p>探索你内心深处的昆虫原型</p>
+        </div>
+
+        <!-- 欢迎页 -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="bug-icons">🐛 🐜 🦋 🕷️ 🦗 🪲</div>
+            <div class="intro">
+                <p>你知道吗？每种昆虫都有独特的性格特质，</p>
+                <p>而你内心深处也藏着一种昆虫原型...</p>
+                <p>回答30道题，找到属于你的昆虫人格，<br>以及你最害怕的"天敌"。</p>
+            </div>
+            <button class="btn-start" onclick="startQuiz()">开始测试 →</button>
+        </div>
+
+        <!-- 测试题目区域 -->
+        <div class="quiz-screen" id="quizScreen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">第 1/30 题</div>
+
+            <div class="question-card">
+                <div class="question-number" id="questionNumber">Q1</div>
+                <div class="question-text" id="questionText">题目加载中...</div>
+            </div>
+
+            <div class="options" id="optionsContainer">
+                <!-- 选项会动态生成 -->
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div class="result-screen" id="resultScreen">
+            <div class="result-main">
+                <div class="result-bug-icon" id="resultBugIcon">🐛</div>
+                <div class="result-title">你的昆虫人格是</div>
+                <div class="result-bug-name" id="resultBugName">加载中...</div>
+                <div class="result-tags" id="resultTags">
+                    <!-- 标签动态生成 -->
+                </div>
+                <div class="result-description" id="resultDescription">
+                    描述加载中...
+                </div>
+            </div>
+
+            <div class="nemesis-section">
+                <div class="nemesis-label">☠️ 你最害怕的虫子 ☠️</div>
+                <div class="nemesis-icon" id="nemesisIcon">🦗</div>
+                <div class="nemesis-name" id="nemesisName">天敌名称</div>
+                <div class="nemesis-reason" id="nemesisReason">"一句扎心的解释"</div>
+            </div>
+
+            <div class="other-results">
+                <h3>📊 其他昆虫匹配度</h3>
+                <div id="otherResults">
+                    <!-- 其他结果动态生成 -->
+                </div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()">重新测试</button>
+        </div>
+    </div>
+
+    <script>
+        /*
+         * ================================================
+         * 天敌对照表
+         * ================================================
+         * 西瓜虫 → 蜘蛛：你躲得再深，它都能把你从角落里扯出来
+         * 螳螂 → 铁线虫：你的锋芒在寄生操控面前毫无意义
+         * 蜜蜂 → 胡蜂：你的秩序会在绝对的暴力面前崩塌
+         * 蝴蝶 → 螳螂：你精心维持的表象，在掠食者眼里就是一顿午餐
+         * 蜘蛛 → 寄生蜂：你以为你是猎手？你的身体才是温床
+         * 蚂蚁 → 食蚁兽：你那套坚不可摧的秩序，一舔就没了
+         * 蜻蜓 → 青蛙：再快的反应也快不过一张嘴
+         * 蜉蝣 → 鱼：你所谓的尽情活过，不过是水面一瞬的涟漪
+         * 独角仙 → 人类：无敌的力量，在智慧面前只是收藏品
+         * 螳蛉 → 鸟类：再怎么伪装，也逃不过降维打击
+         * 沫蝉 → 螳螂：你跑了，但你留下的泡沫暴露了一切
+         * 蝎子 → 猫鼬：你的蛰刺，是最好的开胃菜挑衅
+         */
+
+        // ========== 昆虫原型数据 ==========
+        const BUGS = {
+            watermelonBug: {
+                name: '西瓜虫',
+                icon: '🐛',
+                tags: ['避世', '喜阴湿', '自我保护'],
+                description: '你是一个喜欢躲在角落里的人。不是因为懦弱，而是因为你知道这个世界太危险，保存实力才是王道。你有着敏锐的危机感知能力，总能在麻烦来临前悄悄溜走。但有时候，过度的防备会让你错过一些美好的东西。'
+            },
+            mantis: {
+                name: '螳螂',
+                icon: '🦗',
+                tags: ['攻击性强', '直接的猎手', '自信'],
+                description: '你是一个直面挑战的人，从不回避冲突。你的攻击性不是出于恶意，而是源于对目标的执着追求。你敢于亮剑，哪怕对手比你强大。但记住，锋芒太露有时会伤到自己。'
+            },
+            bee: {
+                name: '蜜蜂',
+                icon: '🐝',
+                tags: ['高度社会化', '勤劳', '秩序'],
+                description: '你是群体中不可或缺的一员。你重视规则和秩序，相信分工协作的力量。你勤劳肯干，为了团队目标可以牺牲个人利益。但有时候，你可能会在忙碌中迷失自己，忘了为什么而忙碌。'
+            },
+            butterfly: {
+                name: '蝴蝶',
+                icon: '🦋',
+                tags: ['外热内冷', '表面社交', '善于伪装'],
+                description: '你是社交场上的高手，表面上热情友好，实际上保持着恰到好处的距离。你懂得如何在不同场合展现最合适的自己，这种适应性是你的天赋。但内心深处，你可能感到一丝孤独。'
+            },
+            spider: {
+                name: '蜘蛛',
+                icon: '🕷️',
+                tags: ['耐心潜伏', '阴谋型', '策略家'],
+                description: '你是一个深谋远虑的人，从不急于求成。你擅长布局设陷，等待最佳的出击时机。你有着惊人的耐心，能够在暗处观察很久很久。但小心，别让阴谋吞噬了你的人性。'
+            },
+            ant: {
+                name: '蚂蚁',
+                icon: '🐜',
+                tags: ['高度秩序', '不容差错', '执行力强'],
+                description: '你是一个完美主义者，对自己和他人都有很高的标准。你相信规则和流程能够战胜一切混乱。你的执行力惊人，一旦下定决心就会坚持到底。但有时候，过于追求完美会让你和周围的人都很累。'
+            },
+            dragonfly: {
+                name: '蜻蜓',
+                icon: '🪰',
+                tags: ['敏捷灵动', '专注力强', '目标明确'],
+                description: '你是效率的化身，总是能快速准确地抓住重点。你的反应敏捷，思维灵活，很少有事情能让你慌乱。你对目标有着极强的专注力，一旦锁定就会全力以赴。但有时候，你可能太专注于前方，而忽略了身边的人。'
+            },
+            mayfly: {
+                name: '蜉蝣',
+                icon: '🦟',
+                tags: ['享乐主义者', '活在当下', '自由不羁'],
+                description: '你是一个及时行乐的人，深谙活在当下的艺术。你不喜欢被束缚，追求自由和即时的快乐。你的存在本身就是一种态度：生命短暂，何不尽兴？但有时候，这种态度可能会让你逃避应尽的责任。'
+            },
+            rhinocerosBeetle: {
+                name: '独角仙',
+                icon: '🪲',
+                tags: ['力大无脑', '正面刚', '勇猛'],
+                description: '你是力量型选手，信奉直接对抗的哲学。与其智取，不如力敌。你的勇气无可挑剔，面对困难从不退缩。你相信只要够强，就没有解决不了的问题。但记住，真正的力量不仅仅是蛮力。'
+            },
+            mantisfly: {
+                name: '螳蛉',
+                icon: '🪳',
+                tags: ['螳螂+蜂的结合', '伪装者', '双重性格'],
+                description: '你是一个复杂的人，有着多面的人格。你既能像猎手一样凶猛，又能像蜜蜂一样融入群体。你的伪装能力很强，总是能根据环境调整自己的角色。但小心，别在伪装中丢失了真正的自己。'
+            },
+            spittlebug: {
+                name: '沫蝉',
+                icon: '🪱',
+                tags: ['跳跃性强', '遇事先跑', '生存本能'],
+                description: '你是生存专家，深谙"留得青山在"之道。面对危险，你的第一反应是逃离，这不是懦弱，而是明智。你的跳跃能力惊人，总能在关键时刻跳脱困境。但有时候，反击比逃跑更能让问题得到解决。'
+            },
+            scorpion: {
+                name: '蝎子',
+                icon: '🦂',
+                tags: ['记仇', '有仇必报', '危险人物'],
+                description: '你是那种"人若犯我，我必犯人"的人。你的记性很好，尤其是别人对你的冒犯。你有着强烈的复仇心理，但这也意味着你活得很累。学会放下，是你这辈子最大的课题。'
+            }
+        };
+
+        // ========== 天敌映射 ==========
+        const NEMESIS = {
+            '西瓜虫': { name: '蜘蛛', icon: '🕷️', reason: '你躲得再深，它都能把你从角落里扯出来' },
+            '螳螂': { name: '铁线虫', icon: '🪱', reason: '你的锋芒在寄生操控面前毫无意义' },
+            '蜜蜂': { name: '胡蜂', icon: '🐝', reason: '你的秩序会在绝对的暴力面前崩塌' },
+            '蝴蝶': { name: '螳螂', icon: '🦗', reason: '你精心维持的表象，在掠食者眼里就是一顿午餐' },
+            '蜘蛛': { name: '寄生蜂', icon: '🐝', reason: '你以为你是猎手？你的身体才是温床' },
+            '蚂蚁': { name: '食蚁兽', icon: '🦎', reason: '你那套坚不可摧的秩序，一舔就没了' },
+            '蜻蜓': { name: '青蛙', icon: '🐸', reason: '再快的反应也快不过一张嘴' },
+            '蜉蝣': { name: '鱼', icon: '🐟', reason: '你所谓的尽情活过，不过是水面一瞬的涟漪' },
+            '独角仙': { name: '人类', icon: '👨', reason: '无敌的力量，在智慧面前只是收藏品' },
+            '螳蛉': { name: '鸟类', icon: '🦅', reason: '再怎么伪装，也逃不过降维打击' },
+            '沫蝉': { name: '螳螂', icon: '🦗', reason: '你跑了，但你留下的泡沫暴露了一切' },
+            '蝎子': { name: '猫鼬', icon: '🦡', reason: '你的蛰刺，是最好的开胃菜挑衅' }
+        };
+
+        // ========== 30道测试题目 ==========
+        const QUESTIONS = [
+            {
+                text: '在派对上，你会怎么做？',
+                options: [
+                    { text: '找个角落躲起来，观察所有人', bug: 'watermelonBug' },
+                    { text: '主动和陌生人搭话，成为焦点', bug: 'butterfly' },
+                    { text: '安静地完成自己的任务，然后离开', bug: 'ant' },
+                    { text: '积极参与各种活动，享受当下', bug: 'mayfly' }
+                ]
+            },
+            {
+                text: '当你遇到强大的敌人时，你会？',
+                options: [
+                    { text: '正面迎战，绝不退缩', bug: 'rhinocerosBeetle' },
+                    { text: '分析局势，寻找对方的弱点', bug: 'spider' },
+                    { text: '召集同伴，一起对抗', bug: 'bee' },
+                    { text: '三十六计走为上', bug: 'spittlebug' }
+                ]
+            },
+            {
+                text: '你更喜欢什么样的工作环境？',
+                options: [
+                    { text: '有明确规则和流程的', bug: 'ant' },
+                    { text: '自由发挥，没有太多限制', bug: 'mayfly' },
+                    { text: '需要团队协作的', bug: 'bee' },
+                    { text: '能让我安静思考的', bug: 'watermelonBug' }
+                ]
+            },
+            {
+                text: '有人冤枉了你，你会？',
+                options: [
+                    { text: '立刻反驳，讨个说法', bug: 'scorpion' },
+                    { text: '冷笑一声，记在心里', bug: 'scorpion' },
+                    { text: '算了，清者自清', bug: 'watermelonBug' },
+                    { text: '用行动证明自己的实力', bug: 'mantis' }
+                ]
+            },
+            {
+                text: '你认为自己最大的优点是？',
+                options: [
+                    { text: '速度和敏捷', bug: 'dragonfly' },
+                    { text: '力量和勇气', bug: 'rhinocerosBeetle' },
+                    { text: '智慧和策略', bug: 'spider' },
+                    { text: '耐心和观察力', bug: 'spider' }
+                ]
+            },
+            {
+                text: '周末你想做什么？',
+                options: [
+                    { text: '宅在家里，享受独处', bug: 'watermelonBug' },
+                    { text: '和朋友出去社交', bug: 'butterfly' },
+                    { text: '参加各种活动，体验新鲜事物', bug: 'mayfly' },
+                    { text: '完成工作或学习目标', bug: 'ant' }
+                ]
+            },
+            {
+                text: '面对选择时，你通常会？',
+                options: [
+                    { text: '跟随直觉，快速决定', bug: 'dragonfly' },
+                    { text: '权衡利弊，三思后行', bug: 'spider' },
+                    { text: '让别人帮你做决定', bug: 'spittlebug' },
+                    { text: '选择最安全的那个', bug: 'watermelonBug' }
+                ]
+            },
+            {
+                text: '你喜欢看什么类型的电影？',
+                options: [
+                    { text: '动作片，拳拳到肉', bug: 'rhinocerosBeetle' },
+                    { text: '悬疑片，需要动脑筋', bug: 'spider' },
+                    { text: '恐怖片，刺激一下', bug: 'scorpion' },
+                    { text: '文艺片，陶冶情操', bug: 'butterfly' }
+                ]
+            },
+            {
+                text: '在团队中，你通常扮演什么角色？',
+                options: [
+                    { text: '领导者，发号施令', bug: 'mantis' },
+                    { text: '协调者，促成合作', bug: 'bee' },
+                    { text: '执行者，完成任务', bug: 'ant' },
+                    { text: '观察者，提供建议', bug: 'spider' }
+                ]
+            },
+            {
+                text: '你害怕什么？',
+                options: [
+                    { text: '被背叛和欺骗', bug: 'scorpion' },
+                    { text: '被困在一个地方', bug: 'mayfly' },
+                    { text: '被暴露在聚光灯下', bug: 'watermelonBug' },
+                    { text: '被卷入麻烦', bug: 'spittlebug' }
+                ]
+            },
+            {
+                text: '你如何看待规则？',
+                options: [
+                    { text: '规则是必要的，需要遵守', bug: 'ant' },
+                    { text: '规则是用来打破的', bug: 'mayfly' },
+                    { text: '看情况，灵活运用', bug: 'dragonfly' },
+                    { text: '无所谓，我不在乎', bug: 'spittlebug' }
+                ]
+            },
+            {
+                text: '当朋友向你倾诉烦恼时，你会？',
+                options: [
+                    { text: '认真倾听，给出建议', bug: 'ant' },
+                    { text: '感同身受，陪伴安慰', bug: 'bee' },
+                    { text: '转移话题，聊点开心的', bug: 'butterfly' },
+                    { text: '听他说完，然后离开', bug: 'dragonfly' }
+                ]
+            },
+            {
+                text: '你更喜欢什么样的天气？',
+                options: [
+                    { text: '阳光明媚，适合户外活动', bug: 'dragonfly' },
+                    { text: '阴天，不热也不冷', bug: 'watermelonBug' },
+                    { text: '下雨天，宅在家里', bug: 'watermelonBug' },
+                    { text: '无所谓，什么天气都行', bug: 'rhinocerosBeetle' }
+                ]
+            },
+            {
+                text: '在竞争中，你会？',
+                options: [
+                    { text: '全力以赴，绝不留情', bug: 'mantis' },
+                    { text: '公平竞争，愿赌服输', bug: 'ant' },
+                    { text: '不参与，保持中立', bug: 'watermelonBug' },
+                    { text: '想办法获得优势', bug: 'spider' }
+                ]
+            },
+            {
+                text: '你觉得自己像什么动物？',
+                options: [
+                    { text: '老虎或狮子', bug: 'rhinocerosBeetle' },
+                    { text: '狐狸或狼', bug: 'spider' },
+                    { text: '猫或狗', bug: 'butterfly' },
+                    { text: '熊猫或兔子', bug: 'spittlebug' }
+                ]
+            },
+            {
+                text: '你更看重什么？',
+                options: [
+                    { text: '结果和成就', bug: 'mantis' },
+                    { text: '过程和体验', bug: 'mayfly' },
+                    { text: '关系和情感', bug: 'bee' },
+                    { text: '安全和稳定', bug: 'ant' }
+                ]
+            },
+            {
+                text: '当你犯了错误，你会？',
+                options: [
+                    { text: '承认错误，承担责任', bug: 'ant' },
+                    { text: '找借口，推卸责任', bug: 'butterfly' },
+                    { text: '默默改正，不再提起', bug: 'dragonfly' },
+                    { text: '假装什么都没发生', bug: 'spider' }
+                ]
+            },
+            {
+                text: '你理想的生活是什么样的？',
+                options: [
+                    { text: '充满挑战和刺激', bug: 'mantis' },
+                    { text: '平静安稳，岁月静好', bug: 'watermelonBug' },
+                    { text: '自由洒脱，无拘无束', bug: 'mayfly' },
+                    { text: '有所成就，受人尊敬', bug: 'bee' }
+                ]
+            },
+            {
+                text: '你擅长什么？',
+                options: [
+                    { text: '战斗和对抗', bug: 'rhinocerosBeetle' },
+                    { text: '策划和布局', bug: 'spider' },
+                    { text: '沟通和协调', bug: 'bee' },
+                    { text: '分析和观察', bug: 'dragonfly' }
+                ]
+            },
+            {
+                text: '你如何看待谎言？',
+                options: [
+                    { text: '绝对不能撒谎', bug: 'ant' },
+                    { text: '白色谎言可以接受', bug: 'butterfly' },
+                    { text: '看情况，有时需要', bug: 'spider' },
+                    { text: '我自己很少说谎', bug: 'mantis' }
+                ]
+            },
+            {
+                text: '当你独处时，你会？',
+                options: [
+                    { text: '思考人生和未来', bug: 'spider' },
+                    { text: '做一些自己喜欢的事', bug: 'mayfly' },
+                    { text: '整理房间或工作', bug: 'ant' },
+                    { text: '感到无聊，想找人玩', bug: 'butterfly' }
+                ]
+            },
+            {
+                text: '你是一个什么样的人？',
+                options: [
+                    { text: '外向开朗', bug: 'butterfly' },
+                    { text: '内向安静', bug: 'watermelonBug' },
+                    { text: '难以捉摸', bug: 'mantis' },
+                    { text: '双重性格', bug: 'mantisfly' }
+                ]
+            },
+            {
+                text: '你做决定的速度？',
+                options: [
+                    { text: '很快，往往凭直觉', bug: 'dragonfly' },
+                    { text: '很慢，需要考虑很久', bug: 'spider' },
+                    { text: '不确定，总是很纠结', bug: 'spittlebug' },
+                    { text: '看情况，有时快有时慢', bug: 'butterfly' }
+                ]
+            },
+            {
+                text: '你更在意别人的看法吗？',
+                options: [
+                    { text: '非常在意', bug: 'butterfly' },
+                    { text: '完全不在乎', bug: 'scorpion' },
+                    { text: '在意的会改，不在意的不管', bug: 'spider' },
+                    { text: '无所谓的态度', bug: 'watermelonBug' }
+                ]
+            },
+            {
+                text: '你如何面对困难？',
+                options: [
+                    { text: '迎难而上', bug: 'rhinocerosBeetle' },
+                    { text: '寻找方法解决', bug: 'dragonfly' },
+                    { text: '请求他人帮助', bug: 'bee' },
+                    { text: '逃避它', bug: 'spittlebug' }
+                ]
+            },
+            {
+                text: '你的沟通风格是？',
+                options: [
+                    { text: '直接了当', bug: 'mantis' },
+                    { text: '委婉含蓄', bug: 'butterfly' },
+                    { text: '逻辑清晰', bug: 'ant' },
+                    { text: '神秘莫测', bug: 'spider' }
+                ]
+            },
+            {
+                text: '你最喜欢什么颜色？',
+                options: [
+                    { text: '红色或橙色', bug: 'mantis' },
+                    { text: '蓝色或绿色', bug: 'dragonfly' },
+                    { text: '黑色或紫色', bug: 'spider' },
+                    { text: '黄色或白色', bug: 'bee' }
+                ]
+            },
+            {
+                text: '你愿意为了目标牺牲什么？',
+                options: [
+                    { text: '时间和精力', bug: 'ant' },
+                    { text: '人际关系', bug: 'mantis' },
+                    { text: '舒适和安稳', bug: 'dragonfly' },
+                    { text: '没什么愿意牺牲的', bug: 'mayfly' }
+                ]
+            },
+            {
+                text: '你觉得自己最大的缺点是？',
+                options: [
+                    { text: '太固执，不懂变通', bug: 'ant' },
+                    { text: '太冲动，不计后果', bug: 'rhinocerosBeetle' },
+                    { text: '太冷淡，不够热情', bug: 'spider' },
+                    { text: '太敏感，想太多', bug: 'scorpion' }
+                ]
+            },
+            {
+                text: '最后，你觉得自己像哪种昆虫？',
+                options: [
+                    { text: '独来独往的猎手', bug: 'mantis' },
+                    { text: '默默耕耘的工兵', bug: 'ant' },
+                    { text: '翩翩起舞的精灵', bug: 'butterfly' },
+                    { text: '神秘莫测的潜伏者', bug: 'spider' }
+                ]
+            }
+        ];
+
+        // ========== 测试状态 ==========
+        let currentQuestion = 0;
+        let scores = {};
+        let answeredQuestions = [];
+
+        // 初始化分数
+        function initScores() {
+            Object.keys(BUGS).forEach(bug => {
+                scores[bug] = 0;
+            });
+        }
+
+        // 开始测试
+        function startQuiz() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.add('active');
+            initScores();
+            currentQuestion = 0;
+            showQuestion();
+        }
+
+        // 显示题目
+        function showQuestion() {
+            const question = QUESTIONS[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Q${currentQuestion + 1}`;
+            document.getElementById('questionText').textContent = question.text;
+
+            const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `第 ${currentQuestion + 1}/${QUESTIONS.length} 题`;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option.text;
+                btn.onclick = () => selectOption(option.bug);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // 选择选项
+        function selectOption(bug) {
+            scores[bug]++;
+            answeredQuestions.push(currentQuestion);
+            currentQuestion++;
+
+            if (currentQuestion < QUESTIONS.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // 显示结果
+        function showResults() {
+            document.getElementById('quizScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+
+            // 找出最高分的昆虫
+            let maxBug = '';
+            let maxScore = 0;
+            Object.entries(scores).forEach(([bug, score]) => {
+                if (score > maxScore) {
+                    maxScore = score;
+                    maxBug = bug;
+                }
+            });
+
+            const bugData = BUGS[maxBug];
+            const nemesis = NEMESIS[bugData.name];
+
+            // 显示主要结果
+            document.getElementById('resultBugIcon').textContent = bugData.icon;
+            document.getElementById('resultBugName').textContent = bugData.name;
+            document.getElementById('resultDescription').textContent = bugData.description;
+
+            // 显示标签
+            const tagsContainer = document.getElementById('resultTags');
+            tagsContainer.innerHTML = '';
+            bugData.tags.forEach(tag => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag';
+                tagEl.textContent = tag;
+                tagsContainer.appendChild(tagEl);
+            });
+
+            // 显示天敌
+            document.getElementById('nemesisIcon').textContent = nemesis.icon;
+            document.getElementById('nemesisName').textContent = nemesis.name;
+            document.getElementById('nemesisReason').textContent = `"${nemesis.reason}"`;
+
+            // 显示其他昆虫匹配度
+            const otherResults = document.getElementById('otherResults');
+            otherResults.innerHTML = '';
+
+            const sortedBugs = Object.entries(scores)
+                .filter(([bug, score]) => bug !== maxBug)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            sortedBugs.forEach(([bug, score]) => {
+                const bugInfo = BUGS[bug];
+                const div = document.createElement('div');
+                div.className = 'mini-result';
+                div.innerHTML = `
+                    <div class="bug-info">
+                        <span class="bug-icon">${bugInfo.icon}</span>
+                        <span class="bug-name">${bugInfo.name}</span>
+                    </div>
+                    <span class="score">${score}分</span>
+                `;
+                otherResults.appendChild(div);
+            });
+
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+
+        // 重新测试
+        function restartQuiz() {
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            currentQuestion = 0;
+            answeredQuestions = [];
+            initScores();
+        }
+    </script>
+</body>
+</html>
